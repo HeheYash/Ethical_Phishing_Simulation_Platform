@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - PhishSim{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Security Training Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('campaigns.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> New Campaign
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Overview Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Campaigns
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_campaigns }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Active Campaigns
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_campaigns }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-play fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Total Targets
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_targets }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Email Templates
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_templates }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Activity Timeline</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                        <a class="dropdown-item" href="#" onclick="loadChartData('7d')">Last 7 days</a>
+                        <a class="dropdown-item" href="#" onclick="loadChartData('30d')">Last 30 days</a>
+                        <a class="dropdown-item" href="#" onclick="loadChartData('90d')">Last 90 days</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="campaignTimelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Activity Summary</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="activitySummaryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Campaigns -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Campaigns</h6>
+            </div>
+            <div class="card-body">
+                {% if recent_campaigns %}
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>Campaign</th>
+                                    <th>Status</th>
+                                    <th>Open Rate</th>
+                                    <th>Click Rate</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for campaign in recent_campaigns %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ campaign.name }}</strong><br>
+                                            <small class="text-muted">Created {{ campaign.created_at.strftime('%Y-%m-%d') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge status-{{ campaign.status }}">
+                                            {{ campaign.status.title() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% set metrics = campaign_metrics.get(campaign.id) %}
+                                        {% if metrics %}
+                                            {{ metrics.open_rate }}%
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if metrics %}
+                                            {{ metrics.click_rate }}%
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('campaigns.view', id=campaign.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('campaigns.index') }}" class="btn btn-primary">View All Campaigns</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                        <h5>No Campaigns Yet</h5>
+                        <p class="text-muted">Create your first phishing simulation campaign to get started.</p>
+                        <a href="{{ url_for('campaigns.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Create Campaign
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Statistics -->
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Platform Statistics</h6>
+            </div>
+            <div class="card-body">
+                {% set overall = overall_metrics %}
+                <div class="row mb-3">
+                    <div class="col-6 text-center">
+                        <div class="metric-value text-primary">{{ overall.unique_opens }}</div>
+                        <div class="metric-label">Email Opens</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="metric-value text-info">{{ overall.unique_clicks }}</div>
+                        <div class="metric-label">Link Clicks</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6 text-center">
+                        <div class="metric-value text-warning">{{ overall.unique_submissions }}</div>
+                        <div class="metric-label">Form Submissions</div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div class="metric-value text-success">{{ overall.total_events }}</div>
+                        <div class="metric-label">Total Events</div>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="mb-3">Campaign Status</h6>
+                {% for status, count in overall.campaign_status_counts.items() %}
+                {% if count > 0 %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge status-{{ status }}">{{ status.title() }}</span>
+                    <span class="text-muted">{{ count }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('campaigns.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i> Create Campaign
+                    </a>
+                    <a href="{{ url_for('dashboard.targets') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-users me-1"></i> Manage Targets
+                    </a>
+                    <a href="{{ url_for('dashboard.templates') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-alt me-1"></i> Email Templates
+                    </a>
+                    <a href="{{ url_for('analytics.dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-bar me-1"></i> View Analytics
+                    </a>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('analytics.overview') }}" class="btn btn-outline-info">
+                        <i class="fas fa-cogs me-1"></i> Platform Admin
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Getting Started -->
+{% if total_campaigns == 0 %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Getting Started with PhishSim</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="feature-icon text-primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h6>1. Add Targets</h6>
+                        <p class="small">Import test users who will receive phishing simulation emails.</p>
+                        <a href="{{ url_for('dashboard.targets') }}" class="btn btn-sm btn-outline-primary">Add Targets</a>
+                    </div>
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="feature-icon text-info">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h6>2. Create Templates</h6>
+                        <p class="small">Design realistic phishing email templates for training.</p>
+                        <a href="{{ url_for('dashboard.templates') }}" class="btn btn-sm btn-outline-info">Manage Templates</a>
+                    </div>
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="feature-icon text-success">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h6>3. Launch Campaign</h6>
+                        <p class="small">Create and send phishing simulation campaigns to your targets.</p>
+                        <a href="{{ url_for('campaigns.create') }}" class="btn btn-sm btn-outline-success">Create Campaign</a>
+                    </div>
+                    <div class="col-md-3 text-center mb-4">
+                        <div class="feature-icon text-warning">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h6>4. Analyze Results</h6>
+                        <p class="small">Review campaign metrics and identify training opportunities.</p>
+                        <a href="{{ url_for('analytics.dashboard') }}" class="btn btn-sm btn-outline-warning">View Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Load chart data when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Charts will be initialized by main.js if Chart.js is available
+    loadChartData('7d');
+});
+
+function loadChartData(timeRange) {
+    // Update timeline chart
+    fetch(`/analytics/api/data?type=campaign_timeline&range=${timeRange}`)
+        .then(response => response.json())
+        .then(data => {
+            updateTimelineChart(data.timeline || {});
+        })
+        .catch(error => console.error('Error loading timeline data:', error));
+
+    // Update activity summary
+    fetch(`/analytics/api/data?type=activity_summary&range=${timeRange}`)
+        .then(response => response.json())
+        .then(data => {
+            updateSummaryChart(data);
+        })
+        .catch(error => console.error('Error loading summary data:', error));
+}
+
+function updateTimelineChart(timelineData) {
+    const ctx = document.getElementById('campaignTimelineChart');
+    if (!ctx) return;
+
+    const chart = Chart.getChart(ctx);
+    if (chart) {
+        const labels = Object.keys(timelineData);
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = labels.map(date => timelineData[date]?.sent || 0);
+        chart.data.datasets[1].data = labels.map(date => timelineData[date]?.opened || 0);
+        chart.data.datasets[2].data = labels.map(date => timelineData[date]?.clicked || 0);
+        chart.update();
+    }
+}
+
+function updateSummaryChart(data) {
+    const ctx = document.getElementById('activitySummaryChart');
+    if (!ctx) return;
+
+    const chart = Chart.getChart(ctx);
+    if (chart && data.events) {
+        chart.data.labels = data.events.map(item => item.name);
+        chart.data.datasets[0].data = data.events.map(item => item.value);
+        chart.update();
+    }
+}
+</script>
+{% endblock %}

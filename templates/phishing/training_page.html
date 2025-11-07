@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Training - Phishing Awareness</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .training-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        .phishing-indicator {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.25rem;
+        }
+        .phishing-indicator.medium {
+            border-left-color: #ffc107;
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .phishing-indicator.low {
+            border-left-color: #28a745;
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .quiz-option {
+            border: 2px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .quiz-option:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+        .quiz-option.selected {
+            border-color: #667eea;
+            background-color: #e7f3ff;
+        }
+        .quiz-option.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        .quiz-option.incorrect {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="training-header">
+        <div class="container">
+            <i class="fas fa-graduation-cap mb-3" style="font-size: 4rem;"></i>
+            <h1 class="display-4">Security Awareness Training</h1>
+            <p class="lead">You've successfully identified a simulated phishing attempt!</p>
+            <div class="alert alert-light d-inline-block">
+                <i class="fas fa-shield-alt me-2"></i>
+                This was a test email for security training purposes only
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <!-- What Happened -->
+        <section class="mb-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2><i class="fas fa-info-circle me-2"></i>What Just Happened?</h2>
+                    <p class="lead">You received a simulated phishing email as part of our security awareness training program. By clicking the link, you've demonstrated awareness that helps protect our organization.</p>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Good job!</strong> Your interaction has been logged for training purposes, but no actual credentials were compromised.
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <i class="fas fa-shield-alt feature-icon text-success"></i>
+                    <h4>You're Protected</h4>
+                    <p>This training helps keep our organization safe</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phishing Indicators -->
+        <section class="mb-5">
+            <h2><i class="fas fa-search me-2"></i>What Made This Email Suspicious?</h2>
+            <div class="row">
+                {% for indicator in phishing_indicators %}
+                <div class="col-lg-6 mb-3">
+                    <div class="phishing-indicator {{ indicator.severity }}">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>{{ indicator.type }}</h5>
+                        <p class="mb-0">{{ indicator.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="mb-5">
+            <h2><i class="fas fa-lightbulb me-2"></i>How to Spot Phishing Emails</h2>
+            <div class="row">
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-user-secret feature-icon"></i>
+                        <h4>Check the Sender</h4>
+                        <p>Verify the sender's email address and be suspicious of unfamiliar senders.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-link feature-icon"></i>
+                        <h4>Hover Over Links</h4>
+                        <p>Hover over links to see the actual URL before clicking. Look for misspellings or suspicious domains.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-clock feature-icon"></i>
+                        <h4>Urgency Tactics</h4>
+                        <p>Be suspicious of emails creating false urgency or threatening immediate consequences.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="text-center">
+                        <i class="fas fa-file-alt feature-icon"></i>
+                        <h4>Grammar & Spelling</h4>
+                        <p>Look for poor grammar, spelling mistakes, and awkward phrasing.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Quiz -->
+        <section class="mb-5">
+            <h2><i class="fas fa-question-circle me-2"></i>Test Your Knowledge</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Quiz: Which email would you be most suspicious of?</h5>
+
+                    <div class="quiz-option" onclick="selectQuizOption(this, false)">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="quiz" id="option1">
+                            <label class="form-check-label" for="option1">
+                                <strong>Option A:</strong> Email from your IT department with proper branding and your correct name
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-option" onclick="selectQuizOption(this, true)">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="quiz" id="option2">
+                            <label class="form-check-label" for="option2">
+                                <strong>Option B:</strong> Email from "security-alert@micr0soft-update.com" asking you to "URGENTLY verify your account NOW"
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-option" onclick="selectQuizOption(this, false)">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="quiz" id="option3">
+                            <label class="form-check-label" for="option3">
+                                <strong>Option C:</strong> Newsletter from a company you subscribed to last month
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button class="btn btn-primary" onclick="checkQuizAnswer()">Check Answer</button>
+                        <div id="quiz-result" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What to Do Next -->
+        <section class="mb-5">
+            <h2><i class="fas fa-clipboard-check me-2"></i>What to Do Next</h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <h5><i class="fas fa-check text-success me-2"></i>If You Suspect Phishing</h5>
+                            <ul class="mb-0">
+                                <li>Don't click any links or download attachments</li>
+                                <li>Don't reply to the email</li>
+                                <li>Report it to your IT security team</li>
+                                <li>Delete the email after reporting</li>
+                            </ul>
+                        </div>
+                        <div class="list-group-item">
+                            <h5><i class="fas fa-shield-alt text-info me-2"></i>If You Already Clicked</h5>
+                            <ul class="mb-0">
+                                <li>Don't enter any credentials or personal information</li>
+                                <li>Immediately change your password if you entered credentials</li>
+                                <li>Contact your IT security team right away</li>
+                                <li>Scan your computer for malware</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <i class="fas fa-phone me-2"></i>Report Suspicious Emails
+                        </div>
+                        <div class="card-body">
+                            <p>If you receive suspicious emails, report them immediately:</p>
+                            <ul class="mb-0">
+                                <li>IT Security: security@company.com</li>
+                                <li>Help Desk: ext. 1234</li>
+                                <li>Use the "Report Phishing" button in your email client</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Resources -->
+        <section class="mb-5">
+            <h2><i class="fas fa-book me-2"></i>Additional Resources</h2>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-video fa-3x mb-3 text-primary"></i>
+                            <h5 class="card-title">Security Training Videos</h5>
+                            <p class="card-text">Watch our collection of security awareness videos.</p>
+                            <a href="#" class="btn btn-outline-primary">Watch Videos</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-pdf fa-3x mb-3 text-danger"></i>
+                            <h5 class="card-title">Security Guidelines</h5>
+                            <p class="card-text">Download our complete security best practices guide.</p>
+                            <a href="#" class="btn btn-outline-danger">Download PDF</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-gamepad fa-3x mb-3 text-success"></i>
+                            <h5 class="card-title">Security Games</h5>
+                            <p class="card-text">Test your skills with our interactive security games.</p>
+                            <a href="#" class="btn btn-outline-success">Play Games</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feedback Form -->
+        <section class="mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Training Feedback</h5>
+                </div>
+                <div class="card-body">
+                    <p>Your feedback helps us improve our security training program.</p>
+                    <form id="feedback-form">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">How helpful was this training?</label>
+                                <select class="form-select" name="helpfulness">
+                                    <option value="">Select...</option>
+                                    <option value="5">Very Helpful</option>
+                                    <option value="4">Helpful</option>
+                                    <option value="3">Neutral</option>
+                                    <option value="2">Not Very Helpful</option>
+                                    <option value="1">Not Helpful at All</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Do you feel more confident identifying phishing?</label>
+                                <select class="form-select" name="confidence">
+                                    <option value="">Select...</option>
+                                    <option value="5">Much More Confident</option>
+                                    <option value="4">More Confident</option>
+                                    <option value="3">Slightly More Confident</option>
+                                    <option value="2">No Change</option>
+                                    <option value="1">Less Confident</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Additional Comments (Optional)</label>
+                            <textarea class="form-control" name="comments" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center py-3">
+        <div class="container">
+            <p class="mb-0">Security Awareness Training - Keeping Our Organization Safe</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedOption = null;
+        const submitToken = "{{ submit_token }}";
+
+        function selectQuizOption(element, isCorrect) {
+            // Remove previous selection
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            // Mark selected
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+            selectedOption = { element, isCorrect };
+        }
+
+        function checkQuizAnswer() {
+            if (!selectedOption) {
+                alert('Please select an answer first.');
+                return;
+            }
+
+            if (selectedOption.isCorrect) {
+                selectedOption.element.classList.add('correct');
+                document.getElementById('quiz-result').innerHTML =
+                    '<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i><strong>Correct!</strong> Option B shows several red flags: a suspicious domain (micr0soft with a zero), urgency tactics, and generic sender information.</div>';
+            } else {
+                selectedOption.element.classList.add('incorrect');
+                document.getElementById('quiz-result').innerHTML =
+                    '<div class="alert alert-danger"><i class="fas fa-times-circle me-2"></i><strong>Not quite.</strong> Option B is the correct answer. The suspicious domain name, urgency tactics, and generic sender are all red flags for phishing.</div>';
+            }
+
+            // Log training interaction
+            logTrainingInteraction('quiz_completed', selectedOption.isCorrect);
+        }
+
+        function logTrainingInteraction(action, data) {
+            // Log to backend for training analytics
+            fetch(`/track/submit/${submitToken}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    training_action: action,
+                    data: data
+                })
+            }).catch(error => {
+                console.log('Training interaction logged');
+            });
+        }
+
+        // Handle feedback form
+        document.getElementById('feedback-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const feedbackData = {
+                helpfulness: formData.get('helpfulness'),
+                confidence: formData.get('confidence'),
+                comments: formData.get('comments')
+            };
+
+            logTrainingInteraction('feedback_submitted', feedbackData);
+
+            // Show success message
+            this.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Thank you for your feedback! Your input helps us improve our security training.
+                </div>
+            `;
+        });
+
+        // Log training page view
+        logTrainingInteraction('training_page_viewed', {
+            indicators_count: {{ phishing_indicators|length }},
+            timestamp: new Date().toISOString()
+        });
+    </script>
+</body>
+</html>
